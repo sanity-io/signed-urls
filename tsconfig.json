@@ -1,0 +1,13 @@
+{
+  "extends": "@sanity/pkg-utils/tsconfig/strictest.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}
