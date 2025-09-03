@@ -1,0 +1,65 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to NPM
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read # for checkout
+
+jobs:
+  release-please:
+    permissions:
+      contents: write # for release-please to create releases and PRs
+      pull-requests: write # for release-please to create PRs
+      id-token: write # to enable use of OIDC for npm provenance
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/create-github-app-token@v2
+        id: generate-token
+        with:
+          app-id: ${{ secrets.ECOSPARK_APP_ID }}
+          private-key: ${{ secrets.ECOSPARK_APP_PRIVATE_KEY }}
+      # This action will create a release PR when regular conventional commits are pushed to main, it'll also detect if a release PR is merged and npm publish should happen
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+      # Publish to NPM on new releases
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
+
+      - uses: pnpm/action-setup@v4
+        if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
+
+      - uses: actions/setup-node@v5
+        if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
+        with:
+          node-version: '24'
+
+      - name: Install deps and build
+        run: pnpm install --frozen-lockfile && pnpm build
+        if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
+
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+        if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+
+      - name: Publish to NPM
+        run: pnpm publish --access=public
+        if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
+        env:
+          NPM_CONFIG_PROVENANCE: true
