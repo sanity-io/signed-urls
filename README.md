@@ -2,13 +2,6 @@
 
 A library for generating Ed25519-signed URLs.
 
-## Features
-
-- 🔐 **Ed25519 digital signatures** for cryptographically secure URL signing
-- ⏰ **Expiry support** with validation to ensure future-dated expiration times
-- 🌐 **Cross-platform compatibility** supporting both Node.js and browser environments
-- 📦 **Base64url encoding** with proper padding to match Go's `base64.URLEncoding` standard
-
 ## Installation
 
 ```bash
