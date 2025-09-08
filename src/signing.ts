@@ -8,10 +8,9 @@ import {normalizeExpiry, toBase64UrlWithPadding} from './utils'
 hashes.sha512 = sha512
 
 /**
- * Gets the signature for a given URL
+ * Generates an Ed25519 signature for a given URL.
  *
  * @public
- *
  * @param url - The URL to sign
  * @param privateKey - The private key to use for signing
  * @returns The base64url-encoded signature
@@ -29,10 +28,9 @@ export function generateSignature(url: string | URL, privateKey: string): string
 }
 
 /**
- * Signs a URL with Ed25519 signature, adding keyid, expiry, and signature parameters
+ * Signs a URL with Ed25519 signature, adding keyid, expiry, and signature parameters.
  *
  * @public
- *
  * @param url - The URL to sign
  * @param options - The signing options to use
  * @returns The signed URL
@@ -40,16 +38,20 @@ export function generateSignature(url: string | URL, privateKey: string): string
 export function signUrl(url: string | URL, options: SigningOptions): string {
   const {expiry, keyId, privateKey} = options
   const baseUrl = new URL(url)
-  // Append keyid
-  baseUrl.searchParams.set('keyid', keyId)
-  // Append expiry, if present
+  // Remove existing params to ensure new ones are added in the correct order.
+  baseUrl.searchParams.delete('keyid')
+  baseUrl.searchParams.delete('expiry')
+  baseUrl.searchParams.delete('signature')
+
+  // Append the signing specific parameters. `set` or `append` after `delete`
+  // will have the same effect, but use `append` to be explicit.
+  baseUrl.searchParams.append('keyid', keyId)
   const expiryStr = normalizeExpiry(expiry)
   if (expiryStr) {
-    baseUrl.searchParams.set('expiry', expiryStr)
+    baseUrl.searchParams.append('expiry', expiryStr)
   }
-  // Append signature
   const signature = generateSignature(baseUrl, privateKey)
-  baseUrl.searchParams.set('signature', signature)
-  // Return as a string
+  baseUrl.searchParams.append('signature', signature)
+
   return baseUrl.toString()
 }

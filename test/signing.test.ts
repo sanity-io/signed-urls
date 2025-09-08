@@ -252,6 +252,35 @@ describe('signUrl', () => {
     expect(out.searchParams.get('signature')).not.toBe('abc')
   })
 
+  it('should replace or remove existing params', () => {
+    const url = `${baseUrl}?signature=abc&keyid=123&expiry=456`
+    const options: SigningOptions = {
+      keyId: TEST_KEY_ID,
+      privateKey: TEST_PRIVATE_KEY,
+    }
+    const out = new URL(signUrl(url, options))
+
+    expect(out.searchParams.getAll('keyid').length).toBe(1)
+    expect(out.searchParams.getAll('expiry').length).toBe(0)
+    expect(out.searchParams.getAll('signature').length).toBe(1)
+
+    expect(out.searchParams.get('keyid')).not.toBe('123')
+    expect(out.searchParams.get('signature')).not.toBe('abc')
+  })
+
+  it('should correctly order replaced existing params', () => {
+    const url = `${baseUrl}?signature=abc&keyid=123&expiry=456`
+    const options: SigningOptions = {
+      expiry: new Date(TEST_EXPIRY),
+      keyId: TEST_KEY_ID,
+      privateKey: TEST_PRIVATE_KEY,
+    }
+    const out = signUrl(url, options)
+
+    expect(out.indexOf('keyid=')).toBeLessThan(out.indexOf('expiry='))
+    expect(out.indexOf('expiry=')).toBeLessThan(out.indexOf('signature='))
+  })
+
   it('should not mutate a passed URL object', () => {
     const url = new URL(baseUrl)
     const snapshot = url.toString()
