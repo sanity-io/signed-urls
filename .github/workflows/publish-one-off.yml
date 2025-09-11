@@ -1,0 +1,39 @@
+name: Publish (one-off from tag)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to publish from (e.g. v1.0.0)'
+        required: true
+
+permissions:
+  contents: read
+  id-token: write # keep for npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Install deps and build
+        run: pnpm install --frozen-lockfile && pnpm build
+
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+
+      - name: Publish to NPM
+        run: pnpm publish --access=public
+        env:
+          NPM_CONFIG_PROVENANCE: true
