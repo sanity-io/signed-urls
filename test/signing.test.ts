@@ -230,11 +230,9 @@ describe('signUrl', () => {
     const parsedUrl = new URL(signedUrl)
 
     // Create the URL that was actually signed (without the signature parameter)
-    const urlForSigning = new URL(baseUrl)
-    urlForSigning.searchParams.set('keyid', TEST_KEY_ID)
-    urlForSigning.searchParams.set('expiry', TEST_EXPIRY)
+    const urlStr = `${baseUrl}?keyid=${TEST_KEY_ID}&expiry=${TEST_EXPIRY}`
 
-    const expectedSignature = generateSignature(urlForSigning.toString(), TEST_PRIVATE_KEY)
+    const expectedSignature = generateSignature(urlStr, TEST_PRIVATE_KEY)
     const actualSignature = parsedUrl.searchParams.get('signature')
 
     expect(actualSignature).toBe(expectedSignature)

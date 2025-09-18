@@ -42,8 +42,8 @@ export function signUrl(url: string | URL, options: SigningOptions): string {
   // Generate a signature from the full URL with the new parameters
   const signature = generateSignature(urlWithParams, privateKey)
   // Append the signature using string concatenation instead of URLSearchParams
-  // to ensure the signature is not URL-encoded (e.g. '=' to '%3D')
-  const urlWithSignature = `${urlWithParams.toString()}&signature=${signature}`
+  // to avoid URL-encoding (e.g. '==' padding to '%3D%3D')
+  const urlWithSignature = `${urlWithParams}&signature=${signature}`
   return urlWithSignature
 }
 
@@ -58,21 +58,23 @@ export function signUrl(url: string | URL, options: SigningOptions): string {
 export function urlWithSigningParams(
   url: string | URL,
   options: Omit<SigningOptions, 'privateKey'>,
-): URL {
+): string {
   const {expiry, keyId} = options
+  // Remove any existing signing specific parameters to avoid duplication
   const urlObj = new URL(url)
-  // Remove existing params to ensure new ones are added in the correct order.
   urlObj.searchParams.delete('keyid')
   urlObj.searchParams.delete('expiry')
   urlObj.searchParams.delete('signature')
+  const baseUrl = urlObj.toString()
 
-  // Append the signing specific parameters. `set` or `append` after `delete`
-  // will have the same effect, but use `append` to be explicit.
-  urlObj.searchParams.append('keyid', keyId)
+  // Determine the initial separator based on existing parameters
+  const separator = urlObj.searchParams.size ? '&' : '?'
+  // Append params using string concatenation instead of URLSearchParams to
+  // avoid URL-encoding
+  let urlWithParams = `${baseUrl}${separator}keyid=${keyId}`
   const expiryStr = normalizeExpiry(expiry)
   if (expiryStr) {
-    urlObj.searchParams.append('expiry', expiryStr)
+    urlWithParams += `&expiry=${expiryStr}`
   }
-
-  return urlObj
+  return urlWithParams
 }
