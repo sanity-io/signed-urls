@@ -1,6 +1,6 @@
 {
   "name": "@sanity/signed-urls",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Sanity.io <hello@sanity.io>",
   "license": "MIT",
   "type": "module",
