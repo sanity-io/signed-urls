@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/sanity-io/signed-urls/compare/signed-urls-v1.0.0...signed-urls-v1.0.1) (2025-09-18)
+
+
+### Bug Fixes
+
+* add missing file extension to hashes import ([#15](https://github.com/sanity-io/signed-urls/issues/15)) ([153a533](https://github.com/sanity-io/signed-urls/commit/153a533d1642a2f33716ab8c8d246acc502f2d90))
+
 ## 1.0.0 (2025-09-11)
 
 
