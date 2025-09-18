@@ -1,5 +1,5 @@
 import {etc, hashes, sign} from '@noble/ed25519'
-import {sha512} from '@noble/hashes/sha2'
+import {sha512} from '@noble/hashes/sha2.js'
 
 import type {SigningOptions} from './types'
 
