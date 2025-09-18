@@ -1,27 +1,22 @@
-#!/usr/bin/env node
-
 import * as fs from 'fs'
 import * as path from 'path'
 
-import {generateSignature, pemToEd25519Hex, signUrl, urlWithSigningParams} from '../src/index.js'
+import {generateSignature, pemToEd25519Hex, signUrl, urlWithSigningParams} from '../src/index'
 
 /**
  * Script to generate signature information from a PEM file
  *
- * Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id>  [expiry]
+ * Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id> [expiry]
  */
 function main() {
   const args = process.argv.slice(2)
 
-  if (args.length < 2) {
-    console.error('Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id>  [expiry]')
+  if (args.length < 3) {
+    console.error('Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id> [expiry]')
     console.error('Examples:')
-    console.error('  npm run sign ./private-key.pem "https://example.com/api/resource"')
+    console.error('  npm run sign ./private-key.pem "https://example.com/api/resource" "my-key-id"')
     console.error(
       '  npm run sign ./private-key.pem "https://example.com/api/resource" "my-key-id" "2025-12-31T23:59:59Z"',
-    )
-    console.error(
-      '  npm run sign ./private-key.pem "https://example.com/api/resource" "my-key-id" "1h" # 1 hour from now',
     )
     process.exit(1)
   }
