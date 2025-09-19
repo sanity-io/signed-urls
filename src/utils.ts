@@ -1,3 +1,5 @@
+import type {Param} from './types'
+
 /**
  * Converts a base64 string to a byte array.
  *
@@ -91,6 +93,32 @@ export function extractPemContents(pem: string): string {
 }
 
 /**
+ * Lexicographically sorts two [key, value] parameter tuples.
+ *
+ * Sorting is first by key, then by value if keys are identical.
+ *
+ * @internal
+ * @param a - The first parameter tuple to compare
+ * @param b - The second parameter tuple to compare
+ * @returns A negative number if a < b, positive if a > b, or 0 if equal
+ */
+export function lexographicSort(a: Param, b: Param): number {
+  const [keyA, valueA] = a
+  const [keyB, valueB] = b
+
+  // First compare the keys
+  if (keyA < keyB) return -1
+  if (keyA > keyB) return 1
+
+  // Keys are equal → compare the values
+  if (valueA < valueB) return -1
+  if (valueA > valueB) return 1
+
+  // Keys and values are identical
+  return 0
+}
+
+/**
  * Normalizes base64url encoding to match RFC 4648 "URL and Filename Safe"
  * Base64 Alphabet, but with padding. Replaces '+' with '-', and '/' with '_',
  * but maintains '=' padding.
@@ -132,6 +160,23 @@ export function normalizeExpiry(expiry: Date | number | string | undefined): str
 
   // Format as 'YYYY-MM-DDTHH:mm:ssZ' (strip milliseconds)
   return date.toISOString().replace(/\.\d{3}Z$/, 'Z')
+}
+
+/**
+ * Encodes a string per RFC 3986 for use in URLs.
+ *
+ * This function uses `encodeURIComponent` and additionally encodes
+ * characters that are not encoded by it: `!'()*`
+ *
+ * @internal
+ * @param str - The string to encode
+ * @returns The RFC 3986 encoded string
+ */
+export function rfc3986(str: string) {
+  return encodeURIComponent(str).replace(
+    /[!'()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  )
 }
 
 /**
