@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/sanity-io/signed-urls/compare/signed-urls-v1.0.2...signed-urls-v2.0.0) (2025-09-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* canonicalise query parameters and use RFC 3986 encoding ([#21](https://github.com/sanity-io/signed-urls/issues/21))
+
+### Features
+
+* canonicalise query parameters and use RFC 3986 encoding ([#21](https://github.com/sanity-io/signed-urls/issues/21)) ([60b4015](https://github.com/sanity-io/signed-urls/commit/60b4015ab994dd5b7c4f5e3c6b515f5087659635))
+
 ## [1.0.2](https://github.com/sanity-io/signed-urls/compare/signed-urls-v1.0.1...signed-urls-v1.0.2) (2025-09-18)
 
 
