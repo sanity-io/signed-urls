@@ -5,8 +5,10 @@ import {
   bytesToBase64,
   ed25519SeedFromPkcs8,
   extractPemContents,
+  lexographicSort,
   normalizeBase64Url,
   normalizeExpiry,
+  rfc3986,
   toBase64UrlWithPadding,
 } from '../src/utils'
 
@@ -251,97 +253,6 @@ describe('normalizeExpiry', () => {
   })
 })
 
-describe('toBase64UrlWithPadding', () => {
-  it('should convert Uint8Array to base64url with padding', () => {
-    const bytes = new Uint8Array([72, 101, 108, 108, 111]) // "Hello"
-    const result = toBase64UrlWithPadding(bytes)
-
-    expect(result).toBe('SGVsbG8=')
-  })
-
-  it('should handle empty Uint8Array', () => {
-    const bytes = new Uint8Array([])
-    const result = toBase64UrlWithPadding(bytes)
-
-    expect(result).toBe('')
-  })
-
-  it('should handle single byte', () => {
-    const bytes = new Uint8Array([65]) // "A"
-    const result = toBase64UrlWithPadding(bytes)
-
-    expect(result).toBe('QQ==')
-  })
-
-  it('should use URL-safe characters (- and _)', () => {
-    // Test data that would produce + and / in standard base64
-    const bytes = new Uint8Array([62, 63, 255]) // Creates >?ÿ which encodes to Pj__
-    const result = toBase64UrlWithPadding(bytes)
-
-    expect(result).not.toContain('+')
-    expect(result).not.toContain('/')
-    expect(result).toMatch(/^[A-Za-z0-9_-]+={0,2}$/)
-  })
-
-  it('should maintain proper padding', () => {
-    // Test different padding scenarios
-    const testCases = [
-      {bytes: new Uint8Array([1]), expectedPadding: 2},
-      {bytes: new Uint8Array([1, 2]), expectedPadding: 1},
-      {bytes: new Uint8Array([1, 2, 3]), expectedPadding: 0},
-      {bytes: new Uint8Array([1, 2, 3, 4]), expectedPadding: 2},
-    ]
-
-    testCases.forEach(({bytes, expectedPadding}) => {
-      const result = toBase64UrlWithPadding(bytes)
-      const actualPadding = (result.match(/=/g) || []).length
-      expect(actualPadding).toBe(expectedPadding)
-    })
-  })
-
-  it('should handle typical Ed25519 signature length (64 bytes)', () => {
-    // Ed25519 signatures are always 64 bytes
-    const signatureBytes = new Uint8Array(64).fill(0)
-    const result = toBase64UrlWithPadding(signatureBytes)
-
-    // 64 bytes should encode to 88 characters in base64 with padding
-    expect(result.length).toBe(88)
-    expect(result).toMatch(/^[A-Za-z0-9_-]+={0,2}$/)
-  })
-
-  it('should work in Node.js environment (with Buffer)', () => {
-    if (typeof Buffer !== 'undefined') {
-      const bytes = new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]) // "Hello World"
-      const result = toBase64UrlWithPadding(bytes)
-
-      expect(result).toBe('SGVsbG8gV29ybGQ=')
-    }
-  })
-
-  it('should produce consistent results for the same input', () => {
-    const bytes = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])
-    const result1 = toBase64UrlWithPadding(bytes)
-    const result2 = toBase64UrlWithPadding(bytes)
-
-    expect(result1).toBe(result2)
-  })
-
-  it('should handle maximum Uint8Array values', () => {
-    const bytes = new Uint8Array([255, 255, 255, 255])
-    const result = toBase64UrlWithPadding(bytes)
-
-    expect(result).toBe('_____w==')
-  })
-
-  it('should handle binary data correctly', () => {
-    const bytes = new Uint8Array([0x00, 0x01, 0x02, 0x03, 0xfd, 0xfe, 0xff])
-    const result = toBase64UrlWithPadding(bytes)
-
-    expect(result).toMatch(/^[A-Za-z0-9_-]+={0,2}$/)
-    expect(result.length % 4).toBe(0) // Should be properly padded
-  })
-})
-
 describe('ed25519SeedFromPkcs8', () => {
   it('should extract 32-byte seed from valid PKCS#8 DER', () => {
     // Create a minimal PKCS#8 structure with a 32-byte OCTET STRING
@@ -517,5 +428,253 @@ CCqGSM49AwEHBG0wawIBAQQg
 
     const result = extractPemContents(pem)
     expect(result).toBe('')
+  })
+})
+
+describe('lexographicSort', () => {
+  it('should sort by key first', () => {
+    const a: [string, string] = ['zebra', 'first']
+    const b: [string, string] = ['apple', 'second']
+
+    expect(lexographicSort(a, b)).toBeGreaterThan(0)
+    expect(lexographicSort(b, a)).toBeLessThan(0)
+  })
+
+  it('should sort by value when keys are equal', () => {
+    const a: [string, string] = ['same', 'zebra']
+    const b: [string, string] = ['same', 'apple']
+
+    expect(lexographicSort(a, b)).toBeGreaterThan(0)
+    expect(lexographicSort(b, a)).toBeLessThan(0)
+  })
+
+  it('should return 0 when both key and value are identical', () => {
+    const a: [string, string] = ['identical', 'value']
+    const b: [string, string] = ['identical', 'value']
+
+    expect(lexographicSort(a, b)).toBe(0)
+  })
+
+  it('should handle empty strings', () => {
+    const a: [string, string] = ['', '']
+    const b: [string, string] = ['', '']
+
+    expect(lexographicSort(a, b)).toBe(0)
+  })
+
+  it('should handle empty string vs non-empty string', () => {
+    const a: [string, string] = ['', 'value']
+    const b: [string, string] = ['key', 'value']
+
+    expect(lexographicSort(a, b)).toBeLessThan(0)
+    expect(lexographicSort(b, a)).toBeGreaterThan(0)
+  })
+
+  it('should handle case-sensitive sorting', () => {
+    const a: [string, string] = ['A', 'value']
+    const b: [string, string] = ['a', 'value']
+
+    // 'A' (65) < 'a' (97) in ASCII
+    expect(lexographicSort(a, b)).toBeLessThan(0)
+    expect(lexographicSort(b, a)).toBeGreaterThan(0)
+  })
+
+  it('should handle numeric strings lexographically', () => {
+    const a: [string, string] = ['10', 'value']
+    const b: [string, string] = ['2', 'value']
+
+    // Lexographic: '1' < '2', so '10' < '2'
+    expect(lexographicSort(a, b)).toBeLessThan(0)
+  })
+
+  it('should handle special characters', () => {
+    const a: [string, string] = ['key!', 'value']
+    const b: [string, string] = ['key@', 'value']
+
+    // '!' (33) < '@' (64) in ASCII
+    expect(lexographicSort(a, b)).toBeLessThan(0)
+  })
+
+  it('should work with URL parameter examples', () => {
+    const params: Array<[string, string]> = [
+      ['url', 'https://sanity.io'],
+      ['expiry', '2025-12-31T23:59:59Z'],
+      ['algorithm', 'ed25519'],
+    ]
+
+    const sorted = params.sort(lexographicSort)
+
+    expect(sorted).toEqual([
+      ['algorithm', 'ed25519'],
+      ['expiry', '2025-12-31T23:59:59Z'],
+      ['url', 'https://sanity.io'],
+    ])
+  })
+
+  it('should handle same key with different values', () => {
+    const params: Array<[string, string]> = [
+      ['param', 'zebra'],
+      ['param', 'apple'],
+      ['param', 'banana'],
+    ]
+
+    const sorted = params.sort(lexographicSort)
+
+    expect(sorted).toEqual([
+      ['param', 'apple'],
+      ['param', 'banana'],
+      ['param', 'zebra'],
+    ])
+  })
+})
+
+describe('rfc3986', () => {
+  it('should encode basic URL-unsafe characters', () => {
+    expect(rfc3986(' ')).toBe('%20')
+    expect(rfc3986('#')).toBe('%23')
+    expect(rfc3986('?')).toBe('%3F')
+    expect(rfc3986('&')).toBe('%26')
+    expect(rfc3986('=')).toBe('%3D')
+  })
+
+  it('should encode additional characters not handled by encodeURIComponent', () => {
+    expect(rfc3986('!')).toBe('%21')
+    expect(rfc3986("'")).toBe('%27')
+    expect(rfc3986('(')).toBe('%28')
+    expect(rfc3986(')')).toBe('%29')
+    expect(rfc3986('*')).toBe('%2A')
+  })
+
+  it('should not encode URL-safe characters', () => {
+    const urlSafe = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~'
+    expect(rfc3986(urlSafe)).toBe(urlSafe)
+  })
+
+  it('should handle empty string', () => {
+    expect(rfc3986('')).toBe('')
+  })
+
+  it('should handle complex URLs', () => {
+    const url = 'https://sanity.io/path?query=value&other=test'
+    const encoded = rfc3986(url)
+
+    expect(encoded).toBe('https%3A%2F%2Fsanity.io%2Fpath%3Fquery%3Dvalue%26other%3Dtest')
+  })
+
+  it('should handle special characters in combination', () => {
+    const input = "Hello World! It's a (test)*"
+    const result = rfc3986(input)
+
+    expect(result).toBe('Hello%20World%21%20It%27s%20a%20%28test%29%2A')
+  })
+
+  it('should handle Unicode characters', () => {
+    expect(rfc3986('café')).toBe('caf%C3%A9')
+    expect(rfc3986('🚀')).toBe('%F0%9F%9A%80')
+  })
+
+  it('should handle percent signs (double encoding prevention)', () => {
+    expect(rfc3986('%20')).toBe('%2520') // % becomes %25
+  })
+
+  it('should handle query parameter values', () => {
+    const value = 'user@sanity.io'
+    expect(rfc3986(value)).toBe('user%40sanity.io')
+  })
+
+  it('should handle file paths with spaces and special chars', () => {
+    const path = '/path/to/file (copy).txt'
+    expect(rfc3986(path)).toBe('%2Fpath%2Fto%2Ffile%20%28copy%29.txt')
+  })
+})
+
+describe('toBase64UrlWithPadding', () => {
+  it('should convert Uint8Array to base64url with padding', () => {
+    const bytes = new Uint8Array([72, 101, 108, 108, 111]) // "Hello"
+    const result = toBase64UrlWithPadding(bytes)
+
+    expect(result).toBe('SGVsbG8=')
+  })
+
+  it('should handle empty Uint8Array', () => {
+    const bytes = new Uint8Array([])
+    const result = toBase64UrlWithPadding(bytes)
+
+    expect(result).toBe('')
+  })
+
+  it('should handle single byte', () => {
+    const bytes = new Uint8Array([65]) // "A"
+    const result = toBase64UrlWithPadding(bytes)
+
+    expect(result).toBe('QQ==')
+  })
+
+  it('should use URL-safe characters (- and _)', () => {
+    // Test data that would produce + and / in standard base64
+    const bytes = new Uint8Array([62, 63, 255]) // Creates >?ÿ which encodes to Pj__
+    const result = toBase64UrlWithPadding(bytes)
+
+    expect(result).not.toContain('+')
+    expect(result).not.toContain('/')
+    expect(result).toMatch(/^[A-Za-z0-9_-]+={0,2}$/)
+  })
+
+  it('should maintain proper padding', () => {
+    // Test different padding scenarios
+    const testCases = [
+      {bytes: new Uint8Array([1]), expectedPadding: 2},
+      {bytes: new Uint8Array([1, 2]), expectedPadding: 1},
+      {bytes: new Uint8Array([1, 2, 3]), expectedPadding: 0},
+      {bytes: new Uint8Array([1, 2, 3, 4]), expectedPadding: 2},
+    ]
+
+    testCases.forEach(({bytes, expectedPadding}) => {
+      const result = toBase64UrlWithPadding(bytes)
+      const actualPadding = (result.match(/=/g) || []).length
+      expect(actualPadding).toBe(expectedPadding)
+    })
+  })
+
+  it('should handle typical Ed25519 signature length (64 bytes)', () => {
+    // Ed25519 signatures are always 64 bytes
+    const signatureBytes = new Uint8Array(64).fill(0)
+    const result = toBase64UrlWithPadding(signatureBytes)
+
+    // 64 bytes should encode to 88 characters in base64 with padding
+    expect(result.length).toBe(88)
+    expect(result).toMatch(/^[A-Za-z0-9_-]+={0,2}$/)
+  })
+
+  it('should work in Node.js environment (with Buffer)', () => {
+    if (typeof Buffer !== 'undefined') {
+      const bytes = new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]) // "Hello World"
+      const result = toBase64UrlWithPadding(bytes)
+
+      expect(result).toBe('SGVsbG8gV29ybGQ=')
+    }
+  })
+
+  it('should produce consistent results for the same input', () => {
+    const bytes = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])
+    const result1 = toBase64UrlWithPadding(bytes)
+    const result2 = toBase64UrlWithPadding(bytes)
+
+    expect(result1).toBe(result2)
+  })
+
+  it('should handle maximum Uint8Array values', () => {
+    const bytes = new Uint8Array([255, 255, 255, 255])
+    const result = toBase64UrlWithPadding(bytes)
+
+    expect(result).toBe('_____w==')
+  })
+
+  it('should handle binary data correctly', () => {
+    const bytes = new Uint8Array([0x00, 0x01, 0x02, 0x03, 0xfd, 0xfe, 0xff])
+    const result = toBase64UrlWithPadding(bytes)
+
+    expect(result).toMatch(/^[A-Za-z0-9_-]+={0,2}$/)
+    expect(result.length % 4).toBe(0) // Should be properly padded
   })
 })

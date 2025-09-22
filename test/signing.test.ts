@@ -53,15 +53,6 @@ describe('generateSignature', () => {
     expect(signature1).toMatch(/^[A-Za-z0-9_-]+={0,2}$/) // Base64url format with optional padding
   })
 
-  it('should handle URL objects', () => {
-    const urlObject = new URL(baseUrl)
-
-    const signature1 = generateSignature(baseUrl, TEST_PRIVATE_KEY)
-    const signature2 = generateSignature(urlObject, TEST_PRIVATE_KEY)
-
-    expect(signature1).toBe(signature2)
-  })
-
   it('should handle URLs with query parameters', () => {
     const url = `${baseUrl}?w=200&h=300`
 

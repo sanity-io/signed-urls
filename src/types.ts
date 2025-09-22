@@ -1,3 +1,5 @@
+export type Param = [string, string]
+
 /**
  * Options for signing URLs with Ed25519
  *
