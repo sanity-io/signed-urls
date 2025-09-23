@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/sanity-io/signed-urls/compare/signed-urls-v2.0.0...signed-urls-v2.0.1) (2025-09-23)
+
+
+### Bug Fixes
+
+* ensure query param reduction without iterator.reduce support ([#23](https://github.com/sanity-io/signed-urls/issues/23)) ([b45ce3f](https://github.com/sanity-io/signed-urls/commit/b45ce3fe958498ec524ab2c0f1e39286814c43e4))
+
 ## [2.0.0](https://github.com/sanity-io/signed-urls/compare/signed-urls-v1.0.2...signed-urls-v2.0.0) (2025-09-22)
 
 
