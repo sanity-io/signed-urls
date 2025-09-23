@@ -16,11 +16,11 @@ hashes.sha512 = sha512
  */
 export function extractUserParams(url: URL): Param[] {
   const reservedKeys = ['keyid', 'expiry', 'signature']
-  return url.searchParams.entries().reduce((params, param) => {
+  return Array.from(url.searchParams).reduce<Param[]>((params, param) => {
     const key = param[0]
     if (!reservedKeys.includes(key)) params.push(param)
     return params
-  }, [] as Param[])
+  }, [])
 }
 
 /**
