@@ -92,6 +92,16 @@ describe('signUrl', () => {
     expect(parsedUrl.searchParams.get('signature')).toBeTruthy()
   })
 
+  it('should throw error when expiry is omitted', () => {
+    expect(() =>
+      signUrl(baseUrl, {
+        keyId: TEST_KEY_ID,
+        privateKey: TEST_PRIVATE_KEY,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any),
+    ).toThrow('Invalid expiry date format')
+  })
+
   it('should serialize Date expiries in UTC (Z)', () => {
     const localDate = new Date('2026-12-31T23:59:59') // no Z
     const out = new URL(
@@ -102,20 +112,6 @@ describe('signUrl', () => {
       }),
     )
     expect(out.searchParams.get('expiry')).toMatch(/Z$/)
-  })
-
-  it('should work without expiry parameter', () => {
-    const options: SigningOptions = {
-      keyId: TEST_KEY_ID,
-      privateKey: TEST_PRIVATE_KEY,
-    }
-
-    const signedUrl = signUrl(baseUrl, options)
-    const parsedUrl = new URL(signedUrl)
-
-    expect(parsedUrl.searchParams.get('keyid')).toBe(TEST_KEY_ID)
-    expect(parsedUrl.searchParams.get('expiry')).toBeNull()
-    expect(parsedUrl.searchParams.get('signature')).toBeTruthy()
   })
 
   it('should handle string expiry dates', () => {
@@ -153,6 +149,7 @@ describe('signUrl', () => {
   it('should handle URL objects', () => {
     const urlObject = new URL(baseUrl)
     const options: SigningOptions = {
+      expiry: TEST_EXPIRY,
       keyId: TEST_KEY_ID,
       privateKey: TEST_PRIVATE_KEY,
     }
@@ -160,15 +157,18 @@ describe('signUrl', () => {
     const signedUrl = signUrl(urlObject, options)
 
     expect(signedUrl).toContain('keyid=')
+    expect(signedUrl).toContain('expiry=')
     expect(signedUrl).toContain('signature=')
   })
 
   it('should generate different signatures for different keyIds', () => {
     const options1: SigningOptions = {
+      expiry: TEST_EXPIRY,
       keyId: 'key1',
       privateKey: TEST_PRIVATE_KEY,
     }
     const options2: SigningOptions = {
+      expiry: TEST_EXPIRY,
       keyId: 'key2',
       privateKey: TEST_PRIVATE_KEY,
     }
@@ -234,6 +234,7 @@ describe('signUrl', () => {
   it('should overwrite an existing signature param', () => {
     const url = `${baseUrl}?signature=abc`
     const options: SigningOptions = {
+      expiry: TEST_EXPIRY,
       keyId: TEST_KEY_ID,
       privateKey: TEST_PRIVATE_KEY,
     }
@@ -246,16 +247,18 @@ describe('signUrl', () => {
   it('should replace or remove existing params', () => {
     const url = `${baseUrl}?signature=abc&keyid=123&expiry=456`
     const options: SigningOptions = {
+      expiry: TEST_EXPIRY,
       keyId: TEST_KEY_ID,
       privateKey: TEST_PRIVATE_KEY,
     }
     const out = new URL(signUrl(url, options))
 
     expect(out.searchParams.getAll('keyid').length).toBe(1)
-    expect(out.searchParams.getAll('expiry').length).toBe(0)
+    expect(out.searchParams.getAll('expiry').length).toBe(1)
     expect(out.searchParams.getAll('signature').length).toBe(1)
 
     expect(out.searchParams.get('keyid')).not.toBe('123')
+    expect(out.searchParams.get('expiry')).not.toBe('456')
     expect(out.searchParams.get('signature')).not.toBe('abc')
   })
 
@@ -276,7 +279,7 @@ describe('signUrl', () => {
     const url = new URL(baseUrl)
     const snapshot = url.toString()
 
-    signUrl(url, {keyId: TEST_KEY_ID, privateKey: TEST_PRIVATE_KEY})
+    signUrl(url, {expiry: TEST_EXPIRY, keyId: TEST_KEY_ID, privateKey: TEST_PRIVATE_KEY})
 
     expect(url.toString()).toBe(snapshot)
   })

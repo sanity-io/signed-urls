@@ -7,15 +7,14 @@ import {extractUserParams, getCanonicalQuery} from '../src/signing'
 /**
  * Script to generate signature information from a PEM file
  *
- * Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id> [expiry]
+ * Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id> <expiry>
  */
 function main() {
   const args = process.argv.slice(2)
 
-  if (args.length < 3) {
-    console.error('Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id> [expiry]')
+  if (args.length < 4) {
+    console.error('Usage: npm run sign <path-to-pem-file> <url-to-sign> <key-id> <expiry>')
     console.error('Examples:')
-    console.error('  npm run sign ./private-key.pem "https://example.com/api/resource" "my-key-id"')
     console.error(
       '  npm run sign ./private-key.pem "https://example.com/api/resource" "my-key-id" "2025-12-31T23:59:59Z"',
     )
@@ -58,7 +57,7 @@ function main() {
     console.info('🔑 Signing URL with Ed25519 Key')
     console.info('   ✅ URL signed successfully')
     console.info(`   📋 Original URL: ${url}`)
-    console.info(`   ⏰ Expires at: ${expiry ?? 'never'}`)
+    console.info(`   ⏰ Expires at: ${expiry}`)
     console.info(`   🔑 Signature: ${signature}`)
     console.info(`   🌐 Signed URL: ${signedUrl}`)
   } catch (error) {

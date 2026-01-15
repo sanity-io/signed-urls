@@ -115,7 +115,7 @@ interface SigningOptions {
   /**
    * Expiry time for the signed URL, either as a Date object or ISO string
    */
-  expiry?: Date | string
+  expiry: Date | string
 }
 ```
 

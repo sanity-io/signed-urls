@@ -79,7 +79,7 @@ export function signUrl(url: string | URL, options: SigningOptions): string {
   const userParams = extractUserParams(urlObj)
   // Canonicalize the query string from the user parameters
   const canonicalQuery = getCanonicalQuery(userParams)
-  // Get the URL with signing parameters (keyid and optional expiry)
+  // Get the URL with signing parameters (keyid and expiry)
   const urlToSign = urlWithSigningParams(urlObj, canonicalQuery, options)
   // Generate a signature from the fully canonicalized URL
   const signature = generateSignature(urlToSign, options.privateKey)
@@ -89,12 +89,12 @@ export function signUrl(url: string | URL, options: SigningOptions): string {
 }
 
 /**
- * Returns a ready-to-sign URL object with signing parameters (keyid and optional expiry).
+ * Returns a ready-to-sign URL object with signing parameters (keyid and expiry).
  *
  * @public
  * @param url - The base URL to which signing parameters will be added
  * @param query - The canonical query string of user parameters
- * @param options - The signing options containing keyId and optional expiry
+ * @param options - The signing options containing keyId and expiry
  * @returns A "signable" URL string with keyid and expiry parameters
  */
 export function urlWithSigningParams(
@@ -111,10 +111,7 @@ export function urlWithSigningParams(
   }
 
   parts.push(`keyid=${rfc3986(signingOptions.keyId)}`)
-
-  if (signingOptions.expiry) {
-    parts.push(`&expiry=${rfc3986(normalizeExpiry(signingOptions.expiry) ?? '')}`)
-  }
+  parts.push(`&expiry=${rfc3986(normalizeExpiry(signingOptions.expiry))}`)
 
   return parts.join('')
 }
