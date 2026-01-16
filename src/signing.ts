@@ -74,6 +74,8 @@ export function getCanonicalQuery(params: Param[]): string {
  * @returns The signed URL
  */
 export function signUrl(url: string | URL, options: SigningOptions): string {
+  validateSigningOptions(options)
+
   const urlObj = new URL(url)
   // Extract user-defined query parameters, excluding reserved signing parameters
   const userParams = extractUserParams(urlObj)
@@ -114,4 +116,32 @@ export function urlWithSigningParams(
   parts.push(`&expiry=${rfc3986(normalizeExpiry(signingOptions.expiry))}`)
 
   return parts.join('')
+}
+
+/**
+ * Validates signing options parameters.
+ *
+ * @internal
+ * @param options - The signing options to validate
+ * @throws When required parameters are missing or empty
+ */
+function validateSigningOptions(options: SigningOptions): void {
+  // Validate required parameters
+  if (!options.keyId) {
+    throw new Error('Missing required parameter: keyId')
+  }
+  if (!options.privateKey) {
+    throw new Error('Missing required parameter: privateKey')
+  }
+  if (!options.expiry) {
+    throw new Error('Missing required parameter: expiry')
+  }
+
+  // Validate strings are not empty
+  if (typeof options.keyId === 'string' && options.keyId.trim() === '') {
+    throw new Error('keyId cannot be empty')
+  }
+  if (typeof options.privateKey === 'string' && options.privateKey.trim() === '') {
+    throw new Error('privateKey cannot be empty')
+  }
 }

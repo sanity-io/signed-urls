@@ -92,13 +92,63 @@ describe('signUrl', () => {
     expect(parsedUrl.searchParams.get('signature')).toBeTruthy()
   })
 
-  it('should throw error when expiry is omitted', () => {
+  it('should throw error when keyId is missing', () => {
+    expect(() =>
+      signUrl(baseUrl, {
+        expiry: TEST_EXPIRY,
+        privateKey: TEST_PRIVATE_KEY,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any),
+    ).toThrow('Missing required parameter: keyId')
+  })
+
+  it('should throw error when privateKey is missing', () => {
+    expect(() =>
+      signUrl(baseUrl, {
+        expiry: TEST_EXPIRY,
+        keyId: TEST_KEY_ID,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any),
+    ).toThrow('Missing required parameter: privateKey')
+  })
+
+  it('should throw error when expiry is missing', () => {
     expect(() =>
       signUrl(baseUrl, {
         keyId: TEST_KEY_ID,
         privateKey: TEST_PRIVATE_KEY,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any),
+    ).toThrow('Missing required parameter: expiry')
+  })
+
+  it('should throw error when keyId is empty string', () => {
+    expect(() =>
+      signUrl(baseUrl, {
+        expiry: TEST_EXPIRY,
+        keyId: '   ',
+        privateKey: TEST_PRIVATE_KEY,
+      }),
+    ).toThrow('keyId cannot be empty')
+  })
+
+  it('should throw error when privateKey is empty string', () => {
+    expect(() =>
+      signUrl(baseUrl, {
+        expiry: TEST_EXPIRY,
+        keyId: TEST_KEY_ID,
+        privateKey: '   ',
+      }),
+    ).toThrow('privateKey cannot be empty')
+  })
+
+  it('should throw error for invalid expiry date format', () => {
+    expect(() =>
+      signUrl(baseUrl, {
+        expiry: 'invalid-date',
+        keyId: TEST_KEY_ID,
+        privateKey: TEST_PRIVATE_KEY,
+      }),
     ).toThrow('Invalid expiry date format')
   })
 
