@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.2](https://github.com/sanity-io/signed-urls/compare/signed-urls-v2.0.1...signed-urls-v2.0.2) (2026-01-16)
+
+
+### Bug Fixes
+
+* enforce expiry parameter when signing ([#25](https://github.com/sanity-io/signed-urls/issues/25)) ([8aec777](https://github.com/sanity-io/signed-urls/commit/8aec7773c91de802c7a0bbc4fcffe32a90320cc9))
+
+
+### Documentation
+
+* add a note about signing image urls ([#26](https://github.com/sanity-io/signed-urls/issues/26)) ([b21ca41](https://github.com/sanity-io/signed-urls/commit/b21ca413a381b47377d68eace50e71eb6c016e71))
+
 ## [2.0.1](https://github.com/sanity-io/signed-urls/compare/signed-urls-v2.0.0...signed-urls-v2.0.1) (2025-09-23)
 
 
