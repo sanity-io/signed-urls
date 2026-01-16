@@ -1,6 +1,8 @@
 # @sanity/signed-urls
 
-A library for generating Ed25519-signed URLs.
+A low-level library for generating Ed25519-signed URLs.
+
+If you're working with images, you'll likely want to use [`@sanity/image-url`](https://github.com/sanity-io/image-url) instead, which provides a more convenient way to build and sign image URLs. Use this library directly if you need to sign other types of URLs or want full control over the signing process.
 
 ## Installation
 
