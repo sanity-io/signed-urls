@@ -136,13 +136,9 @@ export function normalizeBase64Url(base64: string): string {
  *
  * @internal
  * @param expiry - The expiry date to normalize
- * @returns The normalized expiry date as an ISO string, or undefined if invalid
+ * @returns The normalized expiry date as an ISO string
  */
-export function normalizeExpiry(expiry: Date | number | string | undefined): string | undefined {
-  if (expiry === undefined) {
-    return undefined
-  }
-
+export function normalizeExpiry(expiry: Date | number | string): string {
   let date: Date
   if (expiry instanceof Date) {
     date = expiry

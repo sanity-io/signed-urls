@@ -161,10 +161,6 @@ describe('normalizeExpiry', () => {
     vi.useRealTimers()
   })
 
-  it('should return undefined for undefined input', () => {
-    expect(normalizeExpiry(undefined)).toBeUndefined()
-  })
-
   it('should handle Date objects', () => {
     const futureDate = new Date('2026-12-31T23:59:59.999Z')
     const result = normalizeExpiry(futureDate)
@@ -198,6 +194,11 @@ describe('normalizeExpiry', () => {
     const result = normalizeExpiry(dateString)
 
     expect(result).toBe('2026-12-31T00:00:00Z')
+  })
+
+  it('should throw error for undefined input', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => normalizeExpiry(undefined as any)).toThrow('Invalid expiry date format')
   })
 
   it('should throw error for invalid date string', () => {
