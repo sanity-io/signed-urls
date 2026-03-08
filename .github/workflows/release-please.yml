@@ -46,7 +46,7 @@ jobs:
       - uses: actions/setup-node@v5
         if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
         with:
-          node-version: '24'
+          node-version: '24.14.0'
 
       - name: Install deps and build
         run: pnpm install --frozen-lockfile && pnpm build
