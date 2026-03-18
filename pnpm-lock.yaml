@@ -21,6 +21,9 @@ importers:
       '@sanity/pkg-utils':
         specifier: ^10.4.10
         version: 10.4.10(@types/node@24.12.0)(typescript@5.9.2)
+      '@sanity/tsconfig':
+        specifier: ^2.1.0
+        version: 2.1.0
       '@types/node':
         specifier: ^24.12.0
         version: 24.12.0
@@ -1028,6 +1031,9 @@ packages:
     peerDependenciesMeta:
       babel-plugin-react-compiler:
         optional: true
+
+  '@sanity/tsconfig@2.1.0':
+    resolution: {integrity: sha512-Cnz0EycMsfeILkxL/gYzzfPs511OzP3sjQxU4XkDtujdiFAc+bteMYXi4/SJ83m98cXLum63HbHDk+he6AbbIA==}
 
   '@sindresorhus/merge-streams@4.0.0':
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
@@ -3438,6 +3444,8 @@ snapshots:
       - oxc-resolver
       - supports-color
       - vue-tsc
+
+  '@sanity/tsconfig@2.1.0': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
