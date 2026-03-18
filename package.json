@@ -45,7 +45,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
-    "@sanity/pkg-utils": "^8.1.4",
+    "@sanity/pkg-utils": "^10.4.10",
+    "@sanity/tsconfig": "^2.1.0",
     "@types/node": "^24.12.0",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
