@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.5](https://github.com/sanity-io/signed-urls/compare/signed-urls-v2.0.4...signed-urls-v2.0.5) (2026-08-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @noble/hashes to ^2.3.0 ([#60](https://github.com/sanity-io/signed-urls/issues/60)) ([dbbc501](https://github.com/sanity-io/signed-urls/commit/dbbc50102c6a1a7971d1511924e9625f1bc75fd2))
+
 ## [2.0.4](https://github.com/sanity-io/signed-urls/compare/signed-urls-v2.0.3...signed-urls-v2.0.4) (2026-04-22)
 
 
