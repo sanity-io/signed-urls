@@ -22,8 +22,8 @@ importers:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.13.3)(typescript@5.9.3)
       '@sanity/tsconfig':
-        specifier: ^2.1.0
-        version: 2.1.0
+        specifier: ^2.2.1
+        version: 2.2.1
       '@types/node':
         specifier: ^24.13.3
         version: 24.13.3
@@ -1177,8 +1177,8 @@ packages:
       babel-plugin-react-compiler:
         optional: true
 
-  '@sanity/tsconfig@2.1.0':
-    resolution: {integrity: sha512-Cnz0EycMsfeILkxL/gYzzfPs511OzP3sjQxU4XkDtujdiFAc+bteMYXi4/SJ83m98cXLum63HbHDk+he6AbbIA==}
+  '@sanity/tsconfig@2.2.1':
+    resolution: {integrity: sha512-1HbvN+W2bWixgXQnvJ9rev5vJaSbN62d+r0Y2pN6XsK6/MP9JfVyF90elBuIrDENTGgVmxB403+gZow45wq+Pg==}
 
   '@sindresorhus/merge-streams@4.0.0':
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
@@ -3861,7 +3861,7 @@ snapshots:
       - supports-color
       - vue-tsc
 
-  '@sanity/tsconfig@2.1.0': {}
+  '@sanity/tsconfig@2.2.1': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
