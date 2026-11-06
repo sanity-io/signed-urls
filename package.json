@@ -53,13 +53,13 @@
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import-x": "^4.17.1",
     "eslint-plugin-perfectionist": "^4.15.1",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-prettier": "^5.5.7",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "eslint-plugin-unused-imports": "^4.4.1",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.71.0",
+    "typescript-eslint": "^8.72.1",
     "vitest": "^3.2.4"
   },
   "dependencies": {
